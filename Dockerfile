@@ -1,3 +1,5 @@
-FROM apache/hadoop:3
+FROM alpine:latest
 
-CMD [ "/bin/sh" ]
+RUN apk update && apk add --no-cache python3
+
+CMD ["python3"]
