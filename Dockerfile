@@ -27,4 +27,10 @@ RUN ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 RUN cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 RUN chmod 0600 ~/.ssh/authorized_keys
 
+RUN sed '54 c\
+export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")' /home/hadoop_user/hadoop_home/etc/hadoop/hadoop-env.sh > /out.sh
+RUN mv /out.sh /home/hadoop_user/hadoop_home/etc/hadoop/hadoop-env.sh
+RUN echo "PATH=\"\$PATH:/home/hadoop_user/hadoop_home/bin\"" >> /home/hadoop_user/.bashrc
+
+
 CMD ["/bin/sh"]
