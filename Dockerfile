@@ -13,9 +13,9 @@ RUN apt -y install default-jdk
 RUN apt -y install openssh-server
 RUN apt -y install openssh-client
 RUN apt -y install iproute2
-RUN service ssh start
 
 USER hadoop_user
+
 RUN cd /home/hadoop_user
 RUN wget --output-document ~/hadoop-zip.tar.gz https://dlcdn.apache.org/hadoop/common/hadoop-3.3.4/hadoop-3.3.4.tar.gz
 RUN tar xvf ~/hadoop-zip.tar.gz --directory=/home/hadoop_user/
@@ -34,5 +34,20 @@ RUN echo "PATH=\"\$PATH:/home/hadoop_user/hadoop_home/bin\"" >> ~/.bashrc
 
 COPY ./hadoop_config/core-site.xml /home/hadoop_user/hadoop_home/etc/hadoop/core-site.xml
 COPY ./hadoop_config/hdfs-site.xml /home/hadoop_user/hadoop_home/etc/hadoop/hdfs-site.xml
+COPY ./ssh_config/config /home/hadoop_user/.ssh/config
 
-CMD ["/bin/sh"]
+USER root
+RUN echo "service ssh start" >> ~/.bashrc
+RUN chown hadoop_user /home/hadoop_user/.ssh/config
+RUN chown hadoop_user /home/hadoop_user/hadoop_home/etc/hadoop/core-site.xml
+RUN chown hadoop_user /home/hadoop_user/hadoop_home/etc/hadoop/hdfs-site.xml
+
+USER hadoop_user
+RUN chmod 0600 /home/hadoop_user/.ssh/config
+RUN chmod 0600 /home/hadoop_user/hadoop_home/etc/hadoop/core-site.xml
+RUN chmod 0600 /home/hadoop_user/hadoop_home/etc/hadoop/hdfs-site.xml
+
+USER root
+CMD ["bash"]
+
+# fix the base shell for users
